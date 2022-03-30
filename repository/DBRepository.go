@@ -182,3 +182,38 @@ func GetAllBooks() ([]*model.Book, error) {
 
 	return books, nil
 }
+
+//GetAllBooks returns all Books Data
+func GetAllBooksByAuthorName(name string) ([]*model.Book, error) {
+	var books []*model.Book
+	stmt, err := db.Db.Prepare("select Books.ID,Books.Title,Authors.ID,Authors.FirstName,Authors.LastName from Books inner join Authors where Authors.FirstName = ? and Books.AuthorID = Authors.ID;")
+	if err != nil {
+		return nil, err
+	}
+
+	rows, err := stmt.Query(name)
+	if err != nil {
+		return nil, err
+	}
+
+	for rows.Next() {
+		var bookID, title, authorID, firstName, lastName string
+		err := rows.Scan(&bookID, &title, &authorID, &firstName, &lastName)
+		if err != nil {
+			return nil, err
+		}
+
+		book := &model.Book{
+			ID:    bookID,
+			Title: title,
+			Author: &model.Author{
+				ID:        authorID,
+				FirstName: firstName,
+				LastName:  lastName,
+			},
+		}
+		books = append(books, book)
+	}
+
+	return books, nil
+}

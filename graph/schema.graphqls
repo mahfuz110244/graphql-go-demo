@@ -16,6 +16,7 @@ type Query{
   allBooks:[Book]
   authorByID(id:ID):Author!
   allAuthors:[Author]!
+  authors(name : String!): [Book]
 }
 
 type Mutation{
