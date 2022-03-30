@@ -1,0 +1,6 @@
+CREATE TABLE IF NOT EXISTS Books(
+      ID SERIAL PRIMARY KEY,
+      Title VARCHAR(255) NOT NULL,
+      AuthorID INT,
+      FOREIGN KEY (AuthorID) REFERENCES Authors(ID)
+)

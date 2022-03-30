@@ -1,9 +1,9 @@
 package main
 
 import (
-	"graphql-go-demo/graph"
-	"graphql-go-demo/graph/generated"
-	db "graphql-go-demo/internal/pkg/db/mysql"
+	"github.com/mahfuz110244/graphql-go-demo/graph"
+	"github.com/mahfuz110244/graphql-go-demo/graph/generated"
+	db "github.com/mahfuz110244/graphql-go-demo/internal/pkg/db/mysql"
 
 	"log"
 	"net/http"

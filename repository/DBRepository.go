@@ -1,9 +1,10 @@
 package repository
 
 import (
-	"graphql-go-demo/graph/model"
-	db "graphql-go-demo/internal/pkg/db/mysql"
 	"log"
+
+	"github.com/mahfuz110244/graphql-go-demo/graph/model"
+	db "github.com/mahfuz110244/graphql-go-demo/internal/pkg/db/mysql"
 )
 
 //CreateAuthor create's author

@@ -5,10 +5,11 @@ package graph
 
 import (
 	"context"
-	"graphql-go-demo/graph/generated"
-	"graphql-go-demo/graph/model"
-	"graphql-go-demo/repository"
 	"strconv"
+
+	"github.com/mahfuz110244/graphql-go-demo/graph/generated"
+	"github.com/mahfuz110244/graphql-go-demo/graph/model"
+	"github.com/mahfuz110244/graphql-go-demo/repository"
 )
 
 func (r *mutationResolver) CreateBook(ctx context.Context, title string, author string) (*model.Book, error) {
