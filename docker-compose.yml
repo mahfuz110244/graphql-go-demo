@@ -8,8 +8,8 @@ services:
       MYSQL_DATABASE: graphql_demo
     ports:
       - "3306:3306"
-    volumes:
-      - ./pgdata:/var/lib/mysql/data
+    # volumes:
+    #   - ./pgdata:/var/lib/mysql/data
   # postgesql:
   #   image: postgres:latest
   #   container_name: graphql-postgresql

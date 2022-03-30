@@ -5,6 +5,7 @@ package graph
 
 import (
 	"context"
+	"fmt"
 	"strconv"
 
 	"github.com/mahfuz110244/graphql-go-demo/graph/generated"
@@ -12,13 +13,27 @@ import (
 	"github.com/mahfuz110244/graphql-go-demo/repository"
 )
 
-func (r *mutationResolver) CreateBook(ctx context.Context, title string, author string) (*model.Book, error) {
+func (r *mutationResolver) CreatAuthor(ctx context.Context, name string, biography string) (*model.Author, error) {
+	var author model.Author
+	author.Name = name
+	author.Biography = biography
+	id, err := repository.CreateAuthor(author)
+	if err != nil {
+		return nil, err
+	} else {
+		return &model.Author{ID: strconv.FormatInt(id, 10), Name: author.Name, Biography: author.Biography}, nil
+	}
+}
+
+func (r *mutationResolver) CreateBook(ctx context.Context, title string, price int, isbnNo string, author string) (*model.Book, error) {
 	var book model.Book
 	book.Title = title
+	book.Price = price
+	book.IsbnNo = isbnNo
 	book.Author = &model.Author{
 		ID: author,
 	}
-
+	fmt.Println(book)
 	id, err := repository.CreateBook(book)
 	if err != nil {
 		return nil, err
@@ -26,18 +41,6 @@ func (r *mutationResolver) CreateBook(ctx context.Context, title string, author 
 	idStr := strconv.Itoa(int(id))
 	createdBook, _ := repository.GetBooksByID(&idStr)
 	return createdBook, nil
-}
-
-func (r *mutationResolver) CreatAuthor(ctx context.Context, firstName string, lastName string) (*model.Author, error) {
-	var author model.Author
-	author.FirstName = firstName
-	author.LastName = lastName
-	id, err := repository.CreateAuthor(author)
-	if err != nil {
-		return nil, err
-	} else {
-		return &model.Author{ID: strconv.FormatInt(id, 10), FirstName: author.FirstName, LastName: author.LastName}, nil
-	}
 }
 
 func (r *queryResolver) BookByID(ctx context.Context, id *string) (*model.Book, error) {

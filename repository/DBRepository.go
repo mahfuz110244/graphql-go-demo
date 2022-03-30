@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"fmt"
 	"log"
 
 	"github.com/mahfuz110244/graphql-go-demo/graph/model"
@@ -10,13 +11,13 @@ import (
 //CreateAuthor create's author
 func CreateAuthor(author model.Author) (int64, error) {
 
-	stmt, err := db.Db.Prepare("INSERT INTO Authors(FirstName,LastName) VALUES(?,?)")
+	stmt, err := db.Db.Prepare("INSERT INTO Authors(Name,Biography) VALUES(?,?)")
 	if err != nil {
 		log.Fatal(err)
 		return 0, err
 	}
 
-	res, err := stmt.Exec(author.FirstName, author.LastName)
+	res, err := stmt.Exec(author.Name, author.Biography)
 	if err != nil {
 		log.Fatal(err)
 		return 0, err
@@ -52,7 +53,7 @@ func GetAuthorByID(id *string) (*model.Author, error) {
 	defer rows.Close()
 	var author model.Author
 	for rows.Next() {
-		err = rows.Scan(&author.ID, &author.FirstName, &author.LastName)
+		err = rows.Scan(&author.ID, &author.Name, &author.Biography)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -83,7 +84,7 @@ func GetAllAuthors() ([]*model.Author, error) {
 	var authors []*model.Author
 	for rows.Next() {
 		var author model.Author
-		rows.Scan(&author.ID, &author.FirstName, &author.LastName)
+		rows.Scan(&author.ID, &author.Name, &author.Biography)
 		authors = append(authors, &author)
 	}
 
@@ -100,12 +101,13 @@ func GetAllAuthors() ([]*model.Author, error) {
 
 //CreateBook creates new book
 func CreateBook(book model.Book) (int64, error) {
-	stmt, err := db.Db.Prepare("insert into Books(Title,AuthorID) VALUES(?,?)")
+	stmt, err := db.Db.Prepare("insert into Books(Title,Price,IsbnNo,AuthorID) VALUES(?,?,?,?)")
+	fmt.Println(stmt)
 	if err != nil {
 		return 0, err
 	}
 
-	res, err := stmt.Exec(book.Title, book.Author.ID)
+	res, err := stmt.Exec(book.Title, book.Price, book.IsbnNo, book.Author.ID)
 	if err != nil {
 		return 0, err
 	}
@@ -120,27 +122,30 @@ func CreateBook(book model.Book) (int64, error) {
 
 //GetBooksByID returns books by respective id
 func GetBooksByID(id *string) (*model.Book, error) {
-	stmt, err := db.Db.Prepare("select Books.ID,Books.Title,Authors.ID,Authors.FirstName,Authors.LastName from Books inner join Authors where Books.AuthorID = Authors.ID and Books.ID = ? ;")
+	stmt, err := db.Db.Prepare("select Books.ID,Books.Title,Books.Price,Books.IsbnNo,Authors.ID,Authors.Name,Authors.Biography from Books inner join Authors where Books.AuthorID = Authors.ID and Books.ID = ? ;")
 	if err != nil {
 		return nil, err
 	}
 
 	rows, err := stmt.Query(id)
-	var bookID, title, authorID, firstName, lastName string
+	var bookID, title, isbn_no, authorID, name, biography string
+	var price int
 	if rows.Next() {
-		err := rows.Scan(&bookID, &title, &authorID, &firstName, &lastName)
+		err := rows.Scan(&bookID, &title, &price, &isbn_no, &authorID, &name, &biography)
 		if err != nil {
 			return nil, err
 		}
 	}
 
 	book := &model.Book{
-		ID:    bookID,
-		Title: title,
+		ID:     bookID,
+		Title:  title,
+		Price:  price,
+		IsbnNo: isbn_no,
 		Author: &model.Author{
 			ID:        authorID,
-			FirstName: firstName,
-			LastName:  lastName,
+			Name:      name,
+			Biography: biography,
 		},
 	}
 	defer rows.Close()
@@ -151,7 +156,7 @@ func GetBooksByID(id *string) (*model.Book, error) {
 //GetAllBooks returns all Books Data
 func GetAllBooks() ([]*model.Book, error) {
 	var books []*model.Book
-	stmt, err := db.Db.Prepare("select Books.ID,Books.Title,Authors.ID,Authors.FirstName,Authors.LastName from Books inner join Authors where Books.AuthorID = Authors.ID;")
+	stmt, err := db.Db.Prepare("select Books.ID,Books.Title,Books.Price,Books.IsbnNo,Authors.ID,Authors.Name,Authors.Biography from Books inner join Authors where Books.AuthorID = Authors.ID;")
 	if err != nil {
 		return nil, err
 	}
@@ -162,19 +167,22 @@ func GetAllBooks() ([]*model.Book, error) {
 	}
 
 	for rows.Next() {
-		var bookID, title, authorID, firstName, lastName string
-		err := rows.Scan(&bookID, &title, &authorID, &firstName, &lastName)
+		var bookID, title, isbn_no, authorID, name, biography string
+		var price int
+		err := rows.Scan(&bookID, &title, &price, &isbn_no, &authorID, &name, &biography)
 		if err != nil {
 			return nil, err
 		}
 
 		book := &model.Book{
-			ID:    bookID,
-			Title: title,
+			ID:     bookID,
+			Title:  title,
+			Price:  price,
+			IsbnNo: isbn_no,
 			Author: &model.Author{
 				ID:        authorID,
-				FirstName: firstName,
-				LastName:  lastName,
+				Name:      name,
+				Biography: biography,
 			},
 		}
 		books = append(books, book)
@@ -186,7 +194,7 @@ func GetAllBooks() ([]*model.Book, error) {
 //GetAllBooks returns all Books Data
 func GetAllBooksByAuthorName(name string) ([]*model.Book, error) {
 	var books []*model.Book
-	stmt, err := db.Db.Prepare("select Books.ID,Books.Title,Authors.ID,Authors.FirstName,Authors.LastName from Books inner join Authors where Authors.FirstName = ? and Books.AuthorID = Authors.ID;")
+	stmt, err := db.Db.Prepare("select Books.ID,Books.Title,Books.Price,Books.IsbnNo,Authors.ID,Authors.Name,Authors.Biography from Books inner join Authors where Authors.Name = ? and Books.AuthorID = Authors.ID;")
 	if err != nil {
 		return nil, err
 	}
@@ -197,19 +205,22 @@ func GetAllBooksByAuthorName(name string) ([]*model.Book, error) {
 	}
 
 	for rows.Next() {
-		var bookID, title, authorID, firstName, lastName string
-		err := rows.Scan(&bookID, &title, &authorID, &firstName, &lastName)
+		var bookID, title, isbn_no, authorID, name, biography string
+		var price int
+		err := rows.Scan(&bookID, &title, &price, &isbn_no, &authorID, &name, &biography)
 		if err != nil {
 			return nil, err
 		}
 
 		book := &model.Book{
-			ID:    bookID,
-			Title: title,
+			ID:     bookID,
+			Title:  title,
+			Price:  price,
+			IsbnNo: isbn_no,
 			Author: &model.Author{
 				ID:        authorID,
-				FirstName: firstName,
-				LastName:  lastName,
+				Name:      name,
+				Biography: biography,
 			},
 		}
 		books = append(books, book)

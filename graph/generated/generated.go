@@ -44,14 +44,16 @@ type DirectiveRoot struct {
 
 type ComplexityRoot struct {
 	Author struct {
-		FirstName func(childComplexity int) int
+		Biography func(childComplexity int) int
 		ID        func(childComplexity int) int
-		LastName  func(childComplexity int) int
+		Name      func(childComplexity int) int
 	}
 
 	Book struct {
 		Author func(childComplexity int) int
 		ID     func(childComplexity int) int
+		IsbnNo func(childComplexity int) int
+		Price  func(childComplexity int) int
 		Title  func(childComplexity int) int
 	}
 
@@ -60,8 +62,8 @@ type ComplexityRoot struct {
 	}
 
 	Mutation struct {
-		CreatAuthor func(childComplexity int, firstName string, lastName string) int
-		CreateBook  func(childComplexity int, title string, author string) int
+		CreatAuthor func(childComplexity int, name string, biography string) int
+		CreateBook  func(childComplexity int, title string, price int, isbnNo string, author string) int
 	}
 
 	Query struct {
@@ -74,8 +76,8 @@ type ComplexityRoot struct {
 }
 
 type MutationResolver interface {
-	CreateBook(ctx context.Context, title string, author string) (*model.Book, error)
-	CreatAuthor(ctx context.Context, firstName string, lastName string) (*model.Author, error)
+	CreatAuthor(ctx context.Context, name string, biography string) (*model.Author, error)
+	CreateBook(ctx context.Context, title string, price int, isbnNo string, author string) (*model.Book, error)
 }
 type QueryResolver interface {
 	BookByID(ctx context.Context, id *string) (*model.Book, error)
@@ -100,12 +102,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 	_ = ec
 	switch typeName + "." + field {
 
-	case "Author.firstName":
-		if e.complexity.Author.FirstName == nil {
+	case "Author.biography":
+		if e.complexity.Author.Biography == nil {
 			break
 		}
 
-		return e.complexity.Author.FirstName(childComplexity), true
+		return e.complexity.Author.Biography(childComplexity), true
 
 	case "Author.id":
 		if e.complexity.Author.ID == nil {
@@ -114,14 +116,14 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Author.ID(childComplexity), true
 
-	case "Author.lastName":
-		if e.complexity.Author.LastName == nil {
+	case "Author.name":
+		if e.complexity.Author.Name == nil {
 			break
 		}
 
-		return e.complexity.Author.LastName(childComplexity), true
+		return e.complexity.Author.Name(childComplexity), true
 
-	case "Book.Author":
+	case "Book.author":
 		if e.complexity.Book.Author == nil {
 			break
 		}
@@ -134,6 +136,20 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Book.ID(childComplexity), true
+
+	case "Book.isbn_no":
+		if e.complexity.Book.IsbnNo == nil {
+			break
+		}
+
+		return e.complexity.Book.IsbnNo(childComplexity), true
+
+	case "Book.price":
+		if e.complexity.Book.Price == nil {
+			break
+		}
+
+		return e.complexity.Book.Price(childComplexity), true
 
 	case "Book.title":
 		if e.complexity.Book.Title == nil {
@@ -159,7 +175,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.CreatAuthor(childComplexity, args["firstName"].(string), args["lastName"].(string)), true
+		return e.complexity.Mutation.CreatAuthor(childComplexity, args["name"].(string), args["biography"].(string)), true
 
 	case "Mutation.createBook":
 		if e.complexity.Mutation.CreateBook == nil {
@@ -171,7 +187,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.CreateBook(childComplexity, args["title"].(string), args["Author"].(string)), true
+		return e.complexity.Mutation.CreateBook(childComplexity, args["title"].(string), args["price"].(int), args["isbn_no"].(string), args["author"].(string)), true
 
 	case "Query.allAuthors":
 		if e.complexity.Query.AllAuthors == nil {
@@ -290,13 +306,15 @@ var sources = []*ast.Source{
 	{Name: "graph/schema.graphqls", Input: `type Book{
   id: ID!
   title: String!
-  Author: Author!
+  price: Int!
+  isbn_no: String!
+  author: Author!
 }
 
 type Author{
   id: ID!
-  firstName:String!
-  lastName:String!
+  name:String!
+  biography:String!
 }
 
 type Books {
@@ -308,13 +326,12 @@ type Query{
   allBooks:[Book]
   authorByID(id:ID):Author!
   allAuthors:[Author]!
-  # authors(name : String!): [Book]
   authors(name : String!): Books!
 }
 
 type Mutation{
-  createBook(title:String!,Author: ID!): Book!
-  creatAuthor(firstName:String!,lastName:String!):Author!
+  creatAuthor(name:String!, biography:String!):Author!
+  createBook(title:String!, price:Int!, isbn_no:String!, author: ID!): Book!
 }`, BuiltIn: false},
 }
 var parsedSchema = gqlparser.MustLoadSchema(sources...)
@@ -327,23 +344,23 @@ func (ec *executionContext) field_Mutation_creatAuthor_args(ctx context.Context,
 	var err error
 	args := map[string]interface{}{}
 	var arg0 string
-	if tmp, ok := rawArgs["firstName"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("firstName"))
+	if tmp, ok := rawArgs["name"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
 		arg0, err = ec.unmarshalNString2string(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["firstName"] = arg0
+	args["name"] = arg0
 	var arg1 string
-	if tmp, ok := rawArgs["lastName"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("lastName"))
+	if tmp, ok := rawArgs["biography"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("biography"))
 		arg1, err = ec.unmarshalNString2string(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["lastName"] = arg1
+	args["biography"] = arg1
 	return args, nil
 }
 
@@ -359,15 +376,33 @@ func (ec *executionContext) field_Mutation_createBook_args(ctx context.Context, 
 		}
 	}
 	args["title"] = arg0
-	var arg1 string
-	if tmp, ok := rawArgs["Author"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("Author"))
-		arg1, err = ec.unmarshalNID2string(ctx, tmp)
+	var arg1 int
+	if tmp, ok := rawArgs["price"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("price"))
+		arg1, err = ec.unmarshalNInt2int(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["Author"] = arg1
+	args["price"] = arg1
+	var arg2 string
+	if tmp, ok := rawArgs["isbn_no"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("isbn_no"))
+		arg2, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["isbn_no"] = arg2
+	var arg3 string
+	if tmp, ok := rawArgs["author"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("author"))
+		arg3, err = ec.unmarshalNID2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["author"] = arg3
 	return args, nil
 }
 
@@ -504,7 +539,7 @@ func (ec *executionContext) _Author_id(ctx context.Context, field graphql.Collec
 	return ec.marshalNID2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Author_firstName(ctx context.Context, field graphql.CollectedField, obj *model.Author) (ret graphql.Marshaler) {
+func (ec *executionContext) _Author_name(ctx context.Context, field graphql.CollectedField, obj *model.Author) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -522,7 +557,7 @@ func (ec *executionContext) _Author_firstName(ctx context.Context, field graphql
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.FirstName, nil
+		return obj.Name, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -539,7 +574,7 @@ func (ec *executionContext) _Author_firstName(ctx context.Context, field graphql
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Author_lastName(ctx context.Context, field graphql.CollectedField, obj *model.Author) (ret graphql.Marshaler) {
+func (ec *executionContext) _Author_biography(ctx context.Context, field graphql.CollectedField, obj *model.Author) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -557,7 +592,7 @@ func (ec *executionContext) _Author_lastName(ctx context.Context, field graphql.
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.LastName, nil
+		return obj.Biography, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -644,7 +679,77 @@ func (ec *executionContext) _Book_title(ctx context.Context, field graphql.Colle
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Book_Author(ctx context.Context, field graphql.CollectedField, obj *model.Book) (ret graphql.Marshaler) {
+func (ec *executionContext) _Book_price(ctx context.Context, field graphql.CollectedField, obj *model.Book) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Book",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Price, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Book_isbn_no(ctx context.Context, field graphql.CollectedField, obj *model.Book) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Book",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.IsbnNo, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Book_author(ctx context.Context, field graphql.CollectedField, obj *model.Book) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -711,48 +816,6 @@ func (ec *executionContext) _Books_books(ctx context.Context, field graphql.Coll
 	return ec.marshalOBook2ᚕᚖgithubᚗcomᚋmahfuz110244ᚋgraphqlᚑgoᚑdemoᚋgraphᚋmodelᚐBook(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Mutation_createBook(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "Mutation",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   true,
-		IsResolver: true,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	rawArgs := field.ArgumentMap(ec.Variables)
-	args, err := ec.field_Mutation_createBook_args(ctx, rawArgs)
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	fc.Args = args
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().CreateBook(rctx, args["title"].(string), args["Author"].(string))
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(*model.Book)
-	fc.Result = res
-	return ec.marshalNBook2ᚖgithubᚗcomᚋmahfuz110244ᚋgraphqlᚑgoᚑdemoᚋgraphᚋmodelᚐBook(ctx, field.Selections, res)
-}
-
 func (ec *executionContext) _Mutation_creatAuthor(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -778,7 +841,7 @@ func (ec *executionContext) _Mutation_creatAuthor(ctx context.Context, field gra
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().CreatAuthor(rctx, args["firstName"].(string), args["lastName"].(string))
+		return ec.resolvers.Mutation().CreatAuthor(rctx, args["name"].(string), args["biography"].(string))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -793,6 +856,48 @@ func (ec *executionContext) _Mutation_creatAuthor(ctx context.Context, field gra
 	res := resTmp.(*model.Author)
 	fc.Result = res
 	return ec.marshalNAuthor2ᚖgithubᚗcomᚋmahfuz110244ᚋgraphqlᚑgoᚑdemoᚋgraphᚋmodelᚐAuthor(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_createBook(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_createBook_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().CreateBook(rctx, args["title"].(string), args["price"].(int), args["isbn_no"].(string), args["author"].(string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.Book)
+	fc.Result = res
+	return ec.marshalNBook2ᚖgithubᚗcomᚋmahfuz110244ᚋgraphqlᚑgoᚑdemoᚋgraphᚋmodelᚐBook(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query_bookByID(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -2270,9 +2375,9 @@ func (ec *executionContext) _Author(ctx context.Context, sel ast.SelectionSet, o
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
-		case "firstName":
+		case "name":
 			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Author_firstName(ctx, field, obj)
+				return ec._Author_name(ctx, field, obj)
 			}
 
 			out.Values[i] = innerFunc(ctx)
@@ -2280,9 +2385,9 @@ func (ec *executionContext) _Author(ctx context.Context, sel ast.SelectionSet, o
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
-		case "lastName":
+		case "biography":
 			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Author_lastName(ctx, field, obj)
+				return ec._Author_biography(ctx, field, obj)
 			}
 
 			out.Values[i] = innerFunc(ctx)
@@ -2331,9 +2436,29 @@ func (ec *executionContext) _Book(ctx context.Context, sel ast.SelectionSet, obj
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
-		case "Author":
+		case "price":
 			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Book_Author(ctx, field, obj)
+				return ec._Book_price(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "isbn_no":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Book_isbn_no(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "author":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Book_author(ctx, field, obj)
 			}
 
 			out.Values[i] = innerFunc(ctx)
@@ -2399,9 +2524,9 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Mutation")
-		case "createBook":
+		case "creatAuthor":
 			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Mutation_createBook(ctx, field)
+				return ec._Mutation_creatAuthor(ctx, field)
 			}
 
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, innerFunc)
@@ -2409,9 +2534,9 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
-		case "creatAuthor":
+		case "createBook":
 			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Mutation_creatAuthor(ctx, field)
+				return ec._Mutation_createBook(ctx, field)
 			}
 
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, innerFunc)
@@ -3108,6 +3233,21 @@ func (ec *executionContext) unmarshalNID2string(ctx context.Context, v interface
 
 func (ec *executionContext) marshalNID2string(ctx context.Context, sel ast.SelectionSet, v string) graphql.Marshaler {
 	res := graphql.MarshalID(v)
+	if res == graphql.Null {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+	}
+	return res
+}
+
+func (ec *executionContext) unmarshalNInt2int(ctx context.Context, v interface{}) (int, error) {
+	res, err := graphql.UnmarshalInt(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNInt2int(ctx context.Context, sel ast.SelectionSet, v int) graphql.Marshaler {
+	res := graphql.MarshalInt(v)
 	if res == graphql.Null {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "must not be null")

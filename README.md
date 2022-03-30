@@ -3,75 +3,64 @@ GraphQL demo using Golang and MySQL & PostgreSQL
 
 ## Query
 ```
-mutation creatAuthor{
-  creatAuthor(input: {firstName:"John",lastName:"Doe"}) {
-  id 
-  firstName
-  lastName
-	}
-}
-
-mutation creatAuthor{
-  creatAuthor(input: {firstName:"John",lastName:"Doe"}) {
-  id 
-  firstName
-  lastName
-	}
-}
-
-query GetAllAuthors{
-  allAuthors{
+mutation creatAuthor {
+  creatAuthor(name: "John", biography: "good writer") {
     id
-    firstName
-    lastName
+    name
+    biography
   }
 }
 
-query GetAllBooks{
-  allBooks{
+mutation createBook {
+  createBook(title: "Demo Book 1", price: 1000, isbn_no: "BK99y86886", author:"1"){
     id
     title
-    Author{
+    price
+    isbn_no
+    author{
       id
-    	firstName
-    	lastName
+      name
+    	biography
+    }
+  }
+}
+
+query GetAllBooksByAuthorName{
+  authors(name: "John") {
+    books{
+      id
+      title
+      price
+      isbn_no
+      author{
+        id
+        name
+        biography
+      }
     }
   }
 }
 
 
-type Book{
-  id: ID!
-  title: String!
-  Author: Author!
+query GetAllAuthors {
+  allAuthors {
+    id
+    name
+    biography
+  }
 }
 
-input newBook{
-  title: String!
-  Author: ID!
+query GetAllBooks {
+  allBooks {
+   	id
+    title
+    price
+    isbn_no
+    author{
+      id
+      name
+      biography
+    }
+  }
 }
-
-type Author{
-  id: ID!
-  firstName:String!
-  lastName:String!
-}
-
-input newAuthor{
-  firstName:String!
-  lastName:String!
-}
-
-type Query{
-  bookByID(id: ID):Book
-  allBooks:[Book]
-  authorByID(id:ID):Author!
-  allAuthors:[Author]!
-}
-
-type Mutation{
-  createBook(input: newBook): Book!
-  creatAuthor(input: newAuthor):Author!
-}
-
 ```

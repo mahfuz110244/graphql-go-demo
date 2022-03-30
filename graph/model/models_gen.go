@@ -4,14 +4,16 @@ package model
 
 type Author struct {
 	ID        string `json:"id"`
-	FirstName string `json:"firstName"`
-	LastName  string `json:"lastName"`
+	Name      string `json:"name"`
+	Biography string `json:"biography"`
 }
 
 type Book struct {
 	ID     string  `json:"id"`
 	Title  string  `json:"title"`
-	Author *Author `json:"Author"`
+	Price  int     `json:"price"`
+	IsbnNo string  `json:"isbn_no"`
+	Author *Author `json:"author"`
 }
 
 type Books struct {

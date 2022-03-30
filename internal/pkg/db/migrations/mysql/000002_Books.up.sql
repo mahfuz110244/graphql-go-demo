@@ -1,7 +1,10 @@
 CREATE TABLE IF NOT EXISTS Books(
       ID INT NOT NULL UNIQUE AUTO_INCREMENT,
       Title VARCHAR(255) NOT NULL,
-      AuthorID INT,
+      Price DECIMAL(10,2) NOT NULL,
+      IsbnNo VARCHAR(255) NOT NULL UNIQUE,
+      AuthorID INT NOT NULL,
       FOREIGN KEY (AuthorID) REFERENCES Authors(ID),
-      PRIMARY KEY (ID)
-)
+      PRIMARY KEY (ID),
+      INDEX (AuthorID)
+);

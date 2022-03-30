@@ -1,13 +1,15 @@
 type Book{
   id: ID!
   title: String!
-  Author: Author!
+  price: Int!
+  isbn_no: String!
+  author: Author!
 }
 
 type Author{
   id: ID!
-  firstName:String!
-  lastName:String!
+  name:String!
+  biography:String!
 }
 
 type Books {
@@ -19,11 +21,10 @@ type Query{
   allBooks:[Book]
   authorByID(id:ID):Author!
   allAuthors:[Author]!
-  # authors(name : String!): [Book]
   authors(name : String!): Books!
 }
 
 type Mutation{
-  createBook(title:String!,Author: ID!): Book!
-  creatAuthor(firstName:String!,lastName:String!):Author!
+  creatAuthor(name:String!, biography:String!):Author!
+  createBook(title:String!, price:Int!, isbn_no:String!, author: ID!): Book!
 }
