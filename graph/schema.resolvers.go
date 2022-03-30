@@ -75,13 +75,15 @@ func (r *queryResolver) AllAuthors(ctx context.Context) ([]*model.Author, error)
 	}
 }
 
-func (r *queryResolver) Authors(ctx context.Context, name string) ([]*model.Book, error) {
+func (r *queryResolver) Authors(ctx context.Context, name string) (*model.Books, error) {
 	books, err := repository.GetAllBooksByAuthorName(name)
 	if err != nil {
 		return nil, err
 	}
-
-	return books, nil
+	booksData := &model.Books{
+		Books: books,
+	}
+	return booksData, nil
 }
 
 // Mutation returns generated.MutationResolver implementation.

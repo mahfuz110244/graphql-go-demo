@@ -10,13 +10,17 @@ type Author{
   lastName:String!
 }
 
+type Books {
+  books: [Book]
+}
 
 type Query{
   bookByID(id: ID):Book
   allBooks:[Book]
   authorByID(id:ID):Author!
   allAuthors:[Author]!
-  authors(name : String!): [Book]
+  # authors(name : String!): [Book]
+  authors(name : String!): Books!
 }
 
 type Mutation{

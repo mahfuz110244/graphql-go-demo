@@ -13,3 +13,7 @@ type Book struct {
 	Title  string  `json:"title"`
 	Author *Author `json:"Author"`
 }
+
+type Books struct {
+	Books []*Book `json:"books"`
+}
