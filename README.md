@@ -64,3 +64,10 @@ query GetAllBooks {
   }
 }
 ```
+
+## Challenges
+As I have no experienced in GrapQL previously, so first challenge for me understand GraphQL and its structure. Second challenge is generated graph modules suing
+```
+github.com/99designs/gqlgen
+```
+this library in golang.
