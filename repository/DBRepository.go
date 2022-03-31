@@ -1,7 +1,6 @@
 package repository
 
 import (
-	"fmt"
 	"log"
 
 	"github.com/mahfuz110244/graphql-go-demo/graph/model"
@@ -102,7 +101,6 @@ func GetAllAuthors() ([]*model.Author, error) {
 //CreateBook creates new book
 func CreateBook(book model.Book) (int64, error) {
 	stmt, err := db.Db.Prepare("insert into Books(Title,Price,IsbnNo,AuthorID) VALUES(?,?,?,?)")
-	fmt.Println(stmt)
 	if err != nil {
 		return 0, err
 	}

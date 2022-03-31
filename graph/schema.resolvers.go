@@ -5,7 +5,6 @@ package graph
 
 import (
 	"context"
-	"fmt"
 	"strconv"
 
 	"github.com/mahfuz110244/graphql-go-demo/graph/generated"
@@ -33,7 +32,6 @@ func (r *mutationResolver) CreateBook(ctx context.Context, title string, price i
 	book.Author = &model.Author{
 		ID: author,
 	}
-	fmt.Println(book)
 	id, err := repository.CreateBook(book)
 	if err != nil {
 		return nil, err
