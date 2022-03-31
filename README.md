@@ -70,4 +70,4 @@ As I have no experienced in GrapQL previously, so first challenge for me underst
 ```
 github.com/99designs/gqlgen
 ```
-this library in golang.
+this library in golang. Last challenge I have faced is generated the query result for the GetAllTheBooksOfJohn. I need to make diffrent struct format for this.
