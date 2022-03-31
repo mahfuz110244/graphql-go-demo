@@ -17,10 +17,7 @@ type Books {
 }
 
 type Query{
-  bookByID(id: ID):Book
-  allBooks:[Book]
-  authorByID(id:ID):Author!
-  allAuthors:[Author]!
+  books:[Book]
   authors(name : String!): Books!
 }
 

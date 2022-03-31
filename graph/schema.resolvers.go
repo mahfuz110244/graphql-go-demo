@@ -41,39 +41,12 @@ func (r *mutationResolver) CreateBook(ctx context.Context, title string, price i
 	return createdBook, nil
 }
 
-func (r *queryResolver) BookByID(ctx context.Context, id *string) (*model.Book, error) {
-	book, err := repository.GetBooksByID(id)
-	if err != nil {
-		return nil, err
-	}
-	return book, nil
-}
-
-func (r *queryResolver) AllBooks(ctx context.Context) ([]*model.Book, error) {
+func (r *queryResolver) Books(ctx context.Context) ([]*model.Book, error) {
 	books, err := repository.GetAllBooks()
 	if err != nil {
 		return nil, err
 	}
-
 	return books, nil
-}
-
-func (r *queryResolver) AuthorByID(ctx context.Context, id *string) (*model.Author, error) {
-	author, err := repository.GetAuthorByID(id)
-	if err != nil {
-		return nil, err
-	} else {
-		return author, nil
-	}
-}
-
-func (r *queryResolver) AllAuthors(ctx context.Context) ([]*model.Author, error) {
-	authors, err := repository.GetAllAuthors()
-	if err != nil {
-		return nil, err
-	} else {
-		return authors, err
-	}
 }
 
 func (r *queryResolver) Authors(ctx context.Context, name string) (*model.Books, error) {

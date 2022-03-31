@@ -1,6 +1,13 @@
 # github.com/mahfuz110244/graphql-go-demo
 GraphQL demo using Golang and MySQL & PostgreSQL
 
+## Setup
+```
+go run github.com/99designs/gqlgen gqlgen
+go get github.com/99designs/gqlgen@v0.17.2
+go get github.com/99designs/gqlgen/internal/imports@v0.17.2
+```
+
 ## Query
 ```
 mutation creatAuthor {
