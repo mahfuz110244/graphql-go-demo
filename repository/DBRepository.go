@@ -40,7 +40,7 @@ func CreateBook(book model.Book) (int64, error) {
 		return 0, err
 	}
 
-	res, err := stmt.Exec(book.Title, book.Price, book.IsbnNo, book.Author.ID)
+	res, err := stmt.Exec(book.Title, book.Price, book.IsbnNo, book.Authors.ID)
 	if err != nil {
 		return 0, err
 	}
@@ -75,7 +75,7 @@ func GetBooksByID(id *string) (*model.Book, error) {
 		Title:  title,
 		Price:  price,
 		IsbnNo: isbn_no,
-		Author: &model.Author{
+		Authors: &model.Author{
 			ID:        authorID,
 			Name:      name,
 			Biography: biography,
@@ -112,7 +112,7 @@ func GetAllBooks() ([]*model.Book, error) {
 			Title:  title,
 			Price:  price,
 			IsbnNo: isbn_no,
-			Author: &model.Author{
+			Authors: &model.Author{
 				ID:        authorID,
 				Name:      name,
 				Biography: biography,
@@ -150,7 +150,7 @@ func GetAllBooksByAuthorName(name string) ([]*model.Book, error) {
 			Title:  title,
 			Price:  price,
 			IsbnNo: isbn_no,
-			Author: &model.Author{
+			Authors: &model.Author{
 				ID:        authorID,
 				Name:      name,
 				Biography: biography,

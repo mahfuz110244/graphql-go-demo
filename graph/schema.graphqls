@@ -3,7 +3,7 @@ type Book{
   title: String!
   price: Int!
   isbn_no: String!
-  author: Author!
+  authors: Author!
 }
 
 type Author{

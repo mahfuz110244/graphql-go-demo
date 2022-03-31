@@ -29,7 +29,7 @@ func (r *mutationResolver) CreateBook(ctx context.Context, title string, price i
 	book.Title = title
 	book.Price = price
 	book.IsbnNo = isbnNo
-	book.Author = &model.Author{
+	book.Authors = &model.Author{
 		ID: author,
 	}
 	id, err := repository.CreateBook(book)

@@ -50,11 +50,11 @@ type ComplexityRoot struct {
 	}
 
 	Book struct {
-		Author func(childComplexity int) int
-		ID     func(childComplexity int) int
-		IsbnNo func(childComplexity int) int
-		Price  func(childComplexity int) int
-		Title  func(childComplexity int) int
+		Authors func(childComplexity int) int
+		ID      func(childComplexity int) int
+		IsbnNo  func(childComplexity int) int
+		Price   func(childComplexity int) int
+		Title   func(childComplexity int) int
 	}
 
 	Books struct {
@@ -117,12 +117,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Author.Name(childComplexity), true
 
-	case "Book.author":
-		if e.complexity.Book.Author == nil {
+	case "Book.authors":
+		if e.complexity.Book.Authors == nil {
 			break
 		}
 
-		return e.complexity.Book.Author(childComplexity), true
+		return e.complexity.Book.Authors(childComplexity), true
 
 	case "Book.id":
 		if e.complexity.Book.ID == nil {
@@ -271,7 +271,7 @@ var sources = []*ast.Source{
   title: String!
   price: Int!
   isbn_no: String!
-  author: Author!
+  authors: Author!
 }
 
 type Author{
@@ -679,7 +679,7 @@ func (ec *executionContext) _Book_isbn_no(ctx context.Context, field graphql.Col
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Book_author(ctx context.Context, field graphql.CollectedField, obj *model.Book) (ret graphql.Marshaler) {
+func (ec *executionContext) _Book_authors(ctx context.Context, field graphql.CollectedField, obj *model.Book) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -697,7 +697,7 @@ func (ec *executionContext) _Book_author(ctx context.Context, field graphql.Coll
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Author, nil
+		return obj.Authors, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2270,9 +2270,9 @@ func (ec *executionContext) _Book(ctx context.Context, sel ast.SelectionSet, obj
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
-		case "author":
+		case "authors":
 			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Book_author(ctx, field, obj)
+				return ec._Book_authors(ctx, field, obj)
 			}
 
 			out.Values[i] = innerFunc(ctx)
