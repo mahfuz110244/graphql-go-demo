@@ -18,7 +18,6 @@ require (
 	github.com/docker/go-units v0.4.0 // indirect
 	github.com/gorilla/websocket v1.5.0 // indirect
 	github.com/hashicorp/golang-lru v0.5.4 // indirect
-	github.com/lib/pq v1.10.4 // indirect
 	github.com/mitchellh/mapstructure v1.4.3 // indirect
 	github.com/opencontainers/go-digest v1.0.0 // indirect
 	github.com/opencontainers/image-spec v1.0.2 // indirect

@@ -7,6 +7,22 @@ go run github.com/99designs/gqlgen gqlgen
 go get github.com/99designs/gqlgen@v0.17.2
 go get github.com/99designs/gqlgen/internal/imports@v0.17.2
 ```
+## Run
+###
+Create MySQL graphql_demo using below docker command
+```
+docker-compose up --build
+```
+
+### Run the server
+```
+go run .
+```
+
+### GraphQL playground
+```
+http://localhost:8080
+```
 
 ## Query
 
@@ -107,8 +123,8 @@ query GetAllBooksWithAuthors {
 
 
 ## Challenges
-As I have no experienced in GrapQL previously, so first challenge for me understand GraphQL and its structure. Second challenge is generated graph modules using
+As I have no experience in GraphQL previously, the first challenge for me is understanding GraphQL and its structure. Second challenge is generated graph modules using
 ```
 github.com/99designs/gqlgen
 ```
-this library in golang. Last challenge I have faced is generated the query result for the GetAllTheBooksOfJohn. I need to make diffrent struct format for this.
+this library in golang. Last challenge I have faced is generated the query result for the GetAllTheBooksOfJohn. I need to make a different struct format for this.

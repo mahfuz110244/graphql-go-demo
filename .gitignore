@@ -35,7 +35,8 @@ avatars/
 config.env
 tmp/
 
-gmv-inventory-service
+graphql-go-demo
+golang-assignment
 Makefile
 
 bin/
